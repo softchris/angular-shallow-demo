@@ -1,0 +1,6 @@
+<div class="products">
+  <h2>Products</h2>
+  <div class="product" *ngFor="let product of products">
+    <div class="title">{{product.name}}</div> <button (click)="select.emit(product)">Select</button>
+  </div>
+</div>

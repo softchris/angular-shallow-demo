@@ -1,27 +1,45 @@
-import { TestBed, async } from '@angular/core/testing';
 import { AppComponent } from './app.component';
-describe('AppComponent', () => {
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [
-        AppComponent
-      ],
-    }).compileComponents();
-  }));
-  it('should create the app', async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app).toBeTruthy();
-  }));
-  it(`should have as title 'app'`, async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('app');
-  }));
-  it('should render title in a h1 tag', async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
+import { AppModule } from './app.module';
+import { Shallow } from 'shallow-render/dist';
+import { AppService } from './app.service';
+
+describe('App Shallow', () => {
+  let shallow: Shallow<AppComponent>;
+
+  beforeEach(() => {
+    shallow = new Shallow(AppComponent, AppModule)
+      .mock(AppService, {getData: () => Promise.resolve({ title: 'mocked' })});
+  });
+
+  it('should find text', async () => {
+    const {find} = await shallow.render(`<app-root></app-root>`);
+
+    expect(find('.app').nativeElement.innerText).toBe('mocked');
+  });
+
+  it('should change desc', async () => {
+    const comp = await shallow.render(`<app-root></app-root>`);
+    const { find, element, fixture } = comp;
+    const descEl = find('.description').nativeElement;
+
+    expect(descEl.innerText).toBe('');
+    const button = find('button').nativeElement;
+    button.click();
     fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain('Welcome to AngularShallowDemo!');
-  }));
+    expect(descEl.innerText).toBe('clicked');
+  });
+
+  it('should render according to mocks', async () => {
+    const comp = await shallow.render(`<app-root></app-root>`);
+    const { find, element, fixture } = comp;
+    const descEl = find('.description').nativeElement;
+
+    expect(descEl.innerText).toBe('');
+    const button = find('button').nativeElement;
+    button.click();
+    fixture.detectChanges();
+    expect(descEl.innerText).toBe('clicked');
+  });
+
+  // mock services
 });
